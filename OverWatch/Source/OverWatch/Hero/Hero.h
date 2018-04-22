@@ -12,9 +12,9 @@ class OVERWATCH_API AHero : public ACharacter
 	GENERATED_BODY()
 
 protected:
-	/** First person camera */
+	/** 1st person camera*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	class UCameraComponent* FirstPersonCameraComponent;
+	class UCameraComponent* FirstPersonCamera;
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)

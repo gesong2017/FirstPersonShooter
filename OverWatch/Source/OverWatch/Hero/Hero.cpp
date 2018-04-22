@@ -5,6 +5,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "ProjectMacroLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AHero::AHero()
@@ -12,29 +14,44 @@ AHero::AHero()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Create a CameraComponent	
-	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	// Set Hero CapsuleComponent Collision, has nothing to do with damage check
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PICKUP,ECR_Block);
+
+	// Initialize First Person Camera
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
+	FirstPersonCamera->bUsePawnControlRotation = true;
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
-	FirstPersonMesh->SetupAttachment(FirstPersonCameraComponent);
+	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
 	FirstPersonMesh->bOnlyOwnerSee = true;
 	FirstPersonMesh->bOwnerNoSee = false;
+	FirstPersonMesh->bReceivesDecals = false;
 	FirstPersonMesh->bCastDynamicShadow = false;
 	FirstPersonMesh->CastShadow = false;
+	FirstPersonMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	FirstPersonMesh->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+	FirstPersonMesh->SetCollisionObjectType(ECC_Pawn);
+	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FirstPersonMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	// Intialize the actual mesh that will be seen or acted with other actors in game
 	GetMesh()->bOnlyOwnerSee = false;
 	GetMesh()->bOwnerNoSee = true;
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PICKUP, ECR_Ignore);
 }
 
 // Called when the game starts or when spawned
 void AHero::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -61,10 +78,15 @@ void AHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHero::MoveForward(float Value)
 {
-	if (Value != 0.0f)
-	{
+	if (Controller != nullptr&&Value != 0.0f)
+	{   
+		// If player is in the air, use actor rotation instead of controller rotation
+		bool bLimitHeroRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
+		FRotator Rotation = bLimitHeroRotation ? GetActorRotation() : Controller->GetControlRotation();
+		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value);
+		AddMovementInput(Direction, Value);
+		UE_LOG(LogTemp, Warning, TEXT("Value: %f"),Value);
 	}
 }
 
@@ -72,8 +94,13 @@ void AHero::MoveRight(float Value)
 {
 	if (Value != 0.0f)
 	{
+		//// If player is in the air, use actor rotation instead of controller rotation
+		//bool bLimitHeroRotation = (GetCharacterMovement()->IsMovingOnGround() || GetCharacterMovement()->IsFalling());
+		//FRotator Rotation = bLimitHeroRotation ? GetActorRotation() : Controller->GetControlRotation();
+		FRotator Rotation = GetActorRotation();
+		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::Y);
 		// add movement in that direction
-		AddMovementInput(GetActorRightVector(), Value);
+		AddMovementInput(Direction, Value);
 	}
 }
 
