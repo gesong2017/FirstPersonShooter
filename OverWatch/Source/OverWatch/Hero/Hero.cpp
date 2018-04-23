@@ -7,6 +7,7 @@
 #include "Components/InputComponent.h"
 #include "ProjectMacroLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Weapons/HeroGun.h"
 
 // Sets default values
 AHero::AHero()
@@ -18,6 +19,15 @@ AHero::AHero()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PICKUP,ECR_Block);
+
+	// Intialize the actual mesh that will be seen or acted with other actors in game
+	GetMesh()->bOnlyOwnerSee = false;
+	GetMesh()->bOwnerNoSee = true;
+	GetMesh()->SetCollisionObjectType(ECC_Pawn);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(COLLISION_PICKUP, ECR_Ignore);
 
 	// Initialize First Person Camera
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
@@ -37,21 +47,27 @@ AHero::AHero()
 	FirstPersonMesh->SetCollisionObjectType(ECC_Pawn);
 	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FirstPersonMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-
-	// Intialize the actual mesh that will be seen or acted with other actors in game
-	GetMesh()->bOnlyOwnerSee = false;
-	GetMesh()->bOwnerNoSee = true;
-	GetMesh()->SetCollisionObjectType(ECC_Pawn);
-	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
-	GetMesh()->SetCollisionResponseToChannel(COLLISION_PICKUP, ECR_Ignore);
 }
 
 // Called when the game starts or when spawned
 void AHero::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Spawn a Hero Gun and attach to hero
+	if (HeroGun_BP)
+	{
+		FActorSpawnParameters GunSpawnParameter;
+		GunSpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		AHeroGun* CurrentGun = GetWorld()->SpawnActor<AHeroGun>(HeroGun_BP, GunSpawnParameter);
+		if (CurrentGun)
+		{
+			CurrentGun->SetActorHiddenInGame(false);
+			CurrentGun->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
+		}
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("HeroGun_BP is not valid"));
 }
 
 // Called every frame
@@ -86,7 +102,6 @@ void AHero::MoveForward(float Value)
 		FVector Direction = FRotationMatrix(Rotation).GetScaledAxis(EAxis::X);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
-		UE_LOG(LogTemp, Warning, TEXT("Value: %f"),Value);
 	}
 }
 

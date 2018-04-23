@@ -20,6 +20,10 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USkeletalMeshComponent* FirstPersonMesh;
 
+	/** Hero gun blue print class*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<class AHeroGun> HeroGun_BP;
+
 public:
 	// Sets default values for this character's properties
 	AHero();
@@ -40,6 +44,5 @@ private:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
-
 	
 };
