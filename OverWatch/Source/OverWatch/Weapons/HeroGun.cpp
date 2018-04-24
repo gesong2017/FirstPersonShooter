@@ -2,6 +2,8 @@
 
 #include "HeroGun.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Hero/Hero.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AHeroGun::AHeroGun()
@@ -30,6 +32,45 @@ AHeroGun::AHeroGun()
 	//FPPWeaponSkeletalMesh->SetCollisionObjectType(ECC_WorldDynamic);
 	//FPPWeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//FPPWeaponSkeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	// Initialize Weapon Bullets
+	MaxiumNumberOfBullets = 36;
+	CurrentNumberOfBullets = 36;
+}
+
+void AHeroGun::Fire()
+{   
+	AHero* Hero = Cast<AHero>(GetOwner());
+	if (Hero)
+	{   
+		CurrentNumberOfBullets--;
+		// Calculate Line Trace Start and End point
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		Hero->GetHeroCameraInformation(CameraLocation, CameraRotation);
+		FVector TraceEnd = CameraLocation + (CameraRotation.Vector()*10000.0f);
+
+		// Initialize CollisionQueryParams
+		FCollisionQueryParams CollisionQueryParams;
+		CollisionQueryParams.AddIgnoredActor(GetOwner());
+		CollisionQueryParams.AddIgnoredActor(this);
+		CollisionQueryParams.bTraceComplex = true;
+
+		// Use Line Trace to simulate our bullet
+		FHitResult HitResult;
+		bool HitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, TraceEnd, ECC_Visibility, CollisionQueryParams);
+		
+		// Only do stuff when our bullet hit something
+		if (HitSomething == true)
+		{
+			TraceEnd = HitResult.ImpactPoint;
+			DrawDebugSphere(GetWorld(), TraceEnd, 10.0f, 5, FColor::Green, false, 5.0f, 0, 1.0f);
+		}
+
+		// show information for debug purpose
+		DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, FColor::Red, false, 5.0f, 0, 1.0f);
+	}
+
 }
 
 

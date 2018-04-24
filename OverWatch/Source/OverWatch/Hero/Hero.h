@@ -20,9 +20,20 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	class USkeletalMeshComponent* FirstPersonMesh;
 
-	/** Hero gun blue print class*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
-	TSubclassOf<class AHeroGun> HeroGun_BP;
+	/** Hero gun classes*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	class AHeroGun* HeroGun;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<AHeroGun> HeroGun_BP;
+
+	/** Hero aim variable*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	bool bIsAiming;
+
+	/** Hero default bullets*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	int NumOfBulletsLeftOnHero;
 
 public:
 	// Sets default values for this character's properties
@@ -44,5 +55,19 @@ private:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
+
+	// Functions for player aiming
+	void StartAiming();
+	void EndAiming();
+
+	// Functions for player fire and reload
+	void Fire();
+	void Reload();
+
+public:
+	FRotator GetAimOffsets() const;
 	
+	FORCEINLINE bool IsHeroAiming() const { return bIsAiming; }
+
+	void GetHeroCameraInformation(FVector &outPosition, FRotator &outRotation);
 };

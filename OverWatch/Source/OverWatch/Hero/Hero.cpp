@@ -8,6 +8,7 @@
 #include "ProjectMacroLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapons/HeroGun.h"
+#include "ConstructorHelpers.h"
 
 // Sets default values
 AHero::AHero()
@@ -47,6 +48,15 @@ AHero::AHero()
 	FirstPersonMesh->SetCollisionObjectType(ECC_Pawn);
 	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FirstPersonMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	// Find hero gun class
+	static ConstructorHelpers::FClassFinder<AHeroGun> HeroGunBlueprint(TEXT("/Game/Blueprints/Weapons/HeroGun_BP"));
+	HeroGun_BP = HeroGunBlueprint.Class;
+
+	// Initialize variables here
+	HeroGun = nullptr;
+	bIsAiming = false;
+	NumOfBulletsLeftOnHero = 72;
 }
 
 // Called when the game starts or when spawned
@@ -59,15 +69,15 @@ void AHero::BeginPlay()
 	{
 		FActorSpawnParameters GunSpawnParameter;
 		GunSpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		AHeroGun* CurrentGun = GetWorld()->SpawnActor<AHeroGun>(HeroGun_BP, GunSpawnParameter);
-		if (CurrentGun)
-		{
-			CurrentGun->SetActorHiddenInGame(false);
-			CurrentGun->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
+		HeroGun = GetWorld()->SpawnActor<AHeroGun>(HeroGun_BP, GunSpawnParameter);
+		if (HeroGun)
+		{   
+			HeroGun->SetOwner(this);
+			HeroGun->SetActorHiddenInGame(false);
+			HeroGun->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
 		}
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("HeroGun_BP is not valid"));
+		//UE_LOG(LogTemp, Warning, TEXT("HeroGun_BP is not valid"));
 }
 
 // Called every frame
@@ -83,13 +93,20 @@ void AHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// Bind movement events
-	PlayerInputComponent->BindAxis("MoveForward", this, &AHero::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AHero::MoveRight);
+	PlayerInputComponent->BindAxis(TEXT("MoveForward"), this, &AHero::MoveForward);
+	PlayerInputComponent->BindAxis(TEXT("MoveRight"), this, &AHero::MoveRight);
 
 	// Bind rotation events
-	PlayerInputComponent->BindAxis("LookUp", this, &AHero::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("Turn", this, &AHero::AddControllerYawInput);
+	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AHero::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AHero::AddControllerYawInput);
 
+	// Bind aim events
+	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Pressed, this, &AHero::StartAiming);
+	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Released, this, &AHero::EndAiming);
+
+	// Bind Fire and Reload Events
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AHero::Fire);
+	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AHero::Reload);
 }
 
 void AHero::MoveForward(float Value)
@@ -117,6 +134,75 @@ void AHero::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void AHero::StartAiming()
+{
+	bIsAiming = true;
+}
+
+void AHero::EndAiming()
+{
+	bIsAiming = false;
+}
+
+void AHero::Fire()
+{
+	if (HeroGun)
+	{   
+		int32 BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+		if (BulletsLeftOnGun > 0)
+			HeroGun->Fire();
+		else
+			Reload();
+	}
+}
+
+void AHero::Reload()
+{
+	if (HeroGun)
+	{   
+		// Check how many bullets left on gun
+		int MaxiumBulletsOnGun = HeroGun->GetMaxiumNumberOfBullets();
+		int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+
+		// if current number of bullets on gun is less than maxium load and hero still has additional bullets, then we reload
+		if (BulletsLeftOnGun < MaxiumBulletsOnGun && NumOfBulletsLeftOnHero > 0)
+		{
+			//check if we can do a full reload
+			int totalNumberOfBullets = BulletsLeftOnGun + NumOfBulletsLeftOnHero;
+			if (totalNumberOfBullets > MaxiumBulletsOnGun)
+			{
+				HeroGun->UpdateCurrentNumberOfBullets(MaxiumBulletsOnGun);
+				int NumOfReloadedBullets = MaxiumBulletsOnGun - BulletsLeftOnGun;
+				NumOfBulletsLeftOnHero = NumOfBulletsLeftOnHero - NumOfReloadedBullets;
+			}
+			else
+			{
+				HeroGun->UpdateCurrentNumberOfBullets(totalNumberOfBullets);
+				NumOfBulletsLeftOnHero = 0;
+			}
+		}
+
+		// else, do something to tell player that no bullets left
+		else
+		{
+
+		}
+	}
+}
+
+FRotator AHero::GetAimOffsets() const
+{
+	FVector AimDirectionWS = GetBaseAimRotation().Vector();
+	FVector AimDirectionLS = ActorToWorld().InverseTransformVectorNoScale(AimDirectionWS);
+	return AimDirectionLS.Rotation();
+}
+
+void AHero::GetHeroCameraInformation(FVector & outPosition, FRotator & outRotation)
+{
+	outPosition = FirstPersonCamera->GetComponentLocation();
+	outRotation = FirstPersonCamera->GetComponentRotation();
 }
 
 

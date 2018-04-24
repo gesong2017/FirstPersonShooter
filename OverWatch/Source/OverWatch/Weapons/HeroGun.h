@@ -13,13 +13,22 @@ UCLASS()
 class OVERWATCH_API AHeroGun : public AWeapon
 {
 	GENERATED_BODY()
-//protected:
-//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh)
-//	class USkeletalMeshComponent* FPPWeaponSkeletalMesh;
-	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	int MaxiumNumberOfBullets;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	int CurrentNumberOfBullets;
+
 public:
 	AHeroGun();
 
 	//FORCEINLINE USkeletalMeshComponent* GetFirstPersonWeaponSkeletalMesh() const { return FPPWeaponSkeletalMesh; }
 
+	UFUNCTION()
+	void Fire();
+
+	FORCEINLINE int32 GetMaxiumNumberOfBullets() const { return MaxiumNumberOfBullets; }
+	FORCEINLINE int32 GetCurrentNumberOfBullets() const { return CurrentNumberOfBullets; }
+	FORCEINLINE void UpdateCurrentNumberOfBullets(int NumOfBullets) { CurrentNumberOfBullets = NumOfBullets; }
 };

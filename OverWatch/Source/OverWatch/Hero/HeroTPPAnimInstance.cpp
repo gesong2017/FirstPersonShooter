@@ -46,6 +46,10 @@ void UHeroTPPAnimInstance::UpdateAnimationProperties()
 
 			// Set Up Jump State
 			bIsJumping = Hero->GetMovementComponent()->IsFalling();
+
+			// Set AimOffsets variable
+			Yaw = Hero->GetAimOffsets().Yaw;
+			Pitch = Hero->GetAimOffsets().Pitch;
 		}
 	}
 }
