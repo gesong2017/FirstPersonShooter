@@ -12,6 +12,8 @@ AHeroGun::AHeroGun()
 	PrimaryActorTick.bCanEverTick = false;
 
 	// Initialize fpp weapon mesh component
+	WeaponSkeletalMesh->bOnlyOwnerSee = false;
+	WeaponSkeletalMesh->bOwnerNoSee = true;
 	WeaponSkeletalMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
 	WeaponSkeletalMesh->CastShadow = false;
 	WeaponSkeletalMesh->bCastDynamicShadow = false;
@@ -20,18 +22,18 @@ AHeroGun::AHeroGun()
 	WeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponSkeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	//// Initialize a tpp mesh component for hero gun
-	//FPPWeaponSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonWeaponSkeletalMesh"));
-	//FPPWeaponSkeletalMesh->SetupAttachment(WeaponSkeletalMesh);
-	//FPPWeaponSkeletalMesh->bOnlyOwnerSee = true;
-	//FPPWeaponSkeletalMesh->bOwnerNoSee = false;
-	//FPPWeaponSkeletalMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
-	//FPPWeaponSkeletalMesh->CastShadow = false;
-	//FPPWeaponSkeletalMesh->bCastDynamicShadow = false;
-	//FPPWeaponSkeletalMesh->bReceivesDecals = false;
-	//FPPWeaponSkeletalMesh->SetCollisionObjectType(ECC_WorldDynamic);
-	//FPPWeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//FPPWeaponSkeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	// Initialize a fpp mesh component for hero gun
+	FPPWeaponSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonWeaponSkeletalMesh"));
+	FPPWeaponSkeletalMesh->SetupAttachment(WeaponSkeletalMesh);
+	FPPWeaponSkeletalMesh->bOnlyOwnerSee = true;
+	FPPWeaponSkeletalMesh->bOwnerNoSee = false;
+	FPPWeaponSkeletalMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
+	FPPWeaponSkeletalMesh->CastShadow = false;
+	FPPWeaponSkeletalMesh->bCastDynamicShadow = false;
+	FPPWeaponSkeletalMesh->bReceivesDecals = false;
+	FPPWeaponSkeletalMesh->SetCollisionObjectType(ECC_WorldDynamic);
+	FPPWeaponSkeletalMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FPPWeaponSkeletalMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	// Initialize Weapon Bullets
 	MaxiumNumberOfBullets = 36;

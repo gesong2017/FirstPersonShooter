@@ -74,7 +74,9 @@ void AHero::BeginPlay()
 		{   
 			HeroGun->SetOwner(this);
 			HeroGun->SetActorHiddenInGame(false);
-			HeroGun->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
+			// Attach third person weapon mesh to third person hero mesh, Attach first person weapon mesh to first person hero mesh, 
+			HeroGun->GetWeaponSkeletalMesh()->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
+			HeroGun->GetFirstPersonWeaponSkeletalMesh()->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::KeepRelativeTransform, TEXT("WeaponPoint"));
 		}
 	}
 		//UE_LOG(LogTemp, Warning, TEXT("HeroGun_BP is not valid"));
