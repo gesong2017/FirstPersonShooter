@@ -3,31 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
-#include "Engine/Canvas.h"
+#include "Blueprint/UserWidget.h"
 #include "InGameHUD.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class OVERWATCH_API AInGameHUD : public AHUD
+class OVERWATCH_API UInGameHUD : public UUserWidget
 {
 	GENERATED_BODY()
-
-private:
-	UPROPERTY()
-	FCanvasIcon Crosshair;
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
-	float UIScale;
-
-public:
-	AInGameHUD();
 	
-	virtual void DrawHUD() override;
-
-private:
-	void DrawCrosshairOnHUD();
+	
+	
+	
 };

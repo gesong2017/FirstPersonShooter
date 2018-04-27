@@ -13,12 +13,22 @@ UCLASS()
 class OVERWATCH_API AHeroGun : public AWeapon
 {
 	GENERATED_BODY()
+private:
+	FTimerHandle AutomaticFireTimer;
+
+	float LastFireTime;
+
+	float TimeBetweenShots;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh)
 	class USkeletalMeshComponent* FPPWeaponSkeletalMesh;
 
-	//UPROPERTY(EditDefaultOnly, BlueprintReadOnly, Category = Weapon)
-	//TSubclassOf<class UDamageType> DamageType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<class UDamageType> DamageType;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<class UCameraShake> FireRecoil;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	int MaxiumNumberOfBullets;
@@ -26,13 +36,35 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	int CurrentNumberOfBullets;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	FName MuzzleSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
+	int GunBaseDamage;
+
+	// Bullets Per Minute Fired
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
+	float GunFireRate;
+
 public:
 	AHeroGun();
 
-	void Fire();
-	
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	void StartFire();
+	void StopFire();
+
 	FORCEINLINE USkeletalMeshComponent* GetFirstPersonWeaponSkeletalMesh() const { return FPPWeaponSkeletalMesh; }
-	FORCEINLINE int32 GetMaxiumNumberOfBullets() const { return MaxiumNumberOfBullets; }
-	FORCEINLINE int32 GetCurrentNumberOfBullets() const { return CurrentNumberOfBullets; }
+	FORCEINLINE int GetMaxiumNumberOfBullets() const { return MaxiumNumberOfBullets; }
+	FORCEINLINE int GetCurrentNumberOfBullets() const { return CurrentNumberOfBullets; }
 	FORCEINLINE void UpdateCurrentNumberOfBullets(int NumOfBullets) { CurrentNumberOfBullets = NumOfBullets; }
+	FORCEINLINE int GetGunBaseDamage() const { return GunBaseDamage; }
+
+protected:
+	void FireOnce();
+
+private:
+	void PlayImpactEffectsBasedOnSurfaceType(EPhysicalSurface surfaceType, FVector Location);
 };

@@ -3,7 +3,14 @@
 #include "HeroGun.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Hero/Hero.h"
-#include "DrawDebugHelpers.h"
+#include "AI/AICharacters/BaseAICharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "ProjectMacroLibrary.h"
+#include "EffectsLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
+#include "Hero/HeroController.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
+#include "TimerManager.h"
 
 // Sets default values
 AHeroGun::AHeroGun()
@@ -38,41 +45,116 @@ AHeroGun::AHeroGun()
 	// Initialize Weapon Bullets
 	MaxiumNumberOfBullets = 36;
 	CurrentNumberOfBullets = 36;
+	MuzzleSocketName = "MuzzleFlashSocket";
+	GunBaseDamage = 25;
+	GunFireRate = 600.0f;
+	LastFireTime = 0.0f;
+	TimeBetweenShots = 0.0f;
 }
 
-void AHeroGun::Fire()
+void AHeroGun::BeginPlay()
+{
+	Super::BeginPlay();
+	TimeBetweenShots = 60.0f / GunFireRate;
+}
+
+void AHeroGun::StartFire()
+{   
+	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
+	GetWorldTimerManager().SetTimer(AutomaticFireTimer, this, &AHeroGun::FireOnce, TimeBetweenShots, true, FirstDelay);
+}
+
+void AHeroGun::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(AutomaticFireTimer);
+}
+
+void AHeroGun::FireOnce()
 {   
 	AHero* Hero = Cast<AHero>(GetOwner());
 	if (Hero)
 	{   
 		CurrentNumberOfBullets--;
+		//Play VFX at the muzzle location
+		UParticleSystem* MuzzleFire = UEffectsLibrary::GetVFX(EVFXType::MuzzleFire);
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFire, FPPWeaponSkeletalMesh, MuzzleSocketName);
+
 		// Calculate Line Trace Start and End point
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		Hero->GetHeroCameraInformation(CameraLocation, CameraRotation);
-		FVector TraceEnd = CameraLocation + (CameraRotation.Vector()*10000.0f);
+		FVector ShotDirection = CameraRotation.Vector();
+		FVector TraceEnd = CameraLocation + (ShotDirection * 10000.0f);
 
 		// Initialize CollisionQueryParams
 		FCollisionQueryParams CollisionQueryParams;
 		CollisionQueryParams.AddIgnoredActor(GetOwner());
 		CollisionQueryParams.AddIgnoredActor(this);
 		CollisionQueryParams.bTraceComplex = true;
+		CollisionQueryParams.bReturnPhysicalMaterial = true;
 
 		// Use Line Trace to simulate our bullet
 		FHitResult HitResult;
-		bool HitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, TraceEnd, ECC_Visibility, CollisionQueryParams);
+		bool HitSomething = GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, TraceEnd, COLLISION_WEAPON, CollisionQueryParams);
 		
 		// Only do stuff when our bullet hit something
 		if (HitSomething == true)
-		{
+		{   
+			// Set the bullet end point to impactpoint
 			TraceEnd = HitResult.ImpactPoint;
-			DrawDebugSphere(GetWorld(), TraceEnd, 10.0f, 5, FColor::Green, false, 5.0f, 0, 1.0f);
+
+			// Get the surface type of the things we hit
+			EPhysicalSurface HitPointSurfaceType = UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
+
+			// Play different effects based on surface type
+			PlayImpactEffectsBasedOnSurfaceType(HitPointSurfaceType, TraceEnd);
+
+			// check if the bullet hit an ai character or other stuff
+			ABaseAICharacter* AIGotHit = Cast<ABaseAICharacter>(HitResult.GetActor());
+			if (AIGotHit)
+			{   
+				// Head Shot
+				if (HitPointSurfaceType == SURFACE_FLESHVULNERABLE)
+					GunBaseDamage = 100.0f;
+
+				UGameplayStatics::ApplyPointDamage(AIGotHit, GunBaseDamage, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
+			}
 		}
 
-		// show information for debug purpose
-		DrawDebugLine(GetWorld(), CameraLocation, TraceEnd, FColor::Red, false, 5.0f, 0, 1.0f);
+		// Spawn a bullet trail anyway if we didn't hit anything
+		UParticleSystem* BulletTrail = UEffectsLibrary::GetVFX(EVFXType::BulletTrail);
+		FVector MuzzleLocation = FPPWeaponSkeletalMesh->GetSocketLocation(MuzzleSocketName);
+		UParticleSystemComponent* TrailComp = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BulletTrail, MuzzleLocation);
+		if (TrailComp)
+			TrailComp->SetVectorParameter(TEXT("BeamEnd"), TraceEnd);
+
+		// Simulate Fire Recoil use camera shake
+		AHeroController* HeroController = Cast<AHeroController>(Hero->GetController());
+		if (HeroController&&FireRecoil)
+			HeroController->ClientPlayCameraShake(FireRecoil);
+
+		// Update the last time we fired
+		LastFireTime = GetWorld()->TimeSeconds;
+
 	}
 
+}
+
+void AHeroGun::PlayImpactEffectsBasedOnSurfaceType(EPhysicalSurface surfaceType, FVector Location)
+{   
+	UParticleSystem* vfx = nullptr;
+	switch (surfaceType)
+	{
+	case SURFACE_FLESHDEFAULT:
+	case SURFACE_FLESHVULNERABLE:
+		vfx = UEffectsLibrary::GetVFX(EVFXType::BloodImpact);
+		break;
+
+	default:
+		vfx = UEffectsLibrary::GetVFX(EVFXType::GenericImpact);
+		break;
+	}
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), vfx, Location);
 }
 
 

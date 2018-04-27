@@ -17,5 +17,6 @@ class OVERWATCH_API ASinglePlayerGameMode : public AOverWatchGameModeBase
 public:
 	ASinglePlayerGameMode();
 	
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 	
 };

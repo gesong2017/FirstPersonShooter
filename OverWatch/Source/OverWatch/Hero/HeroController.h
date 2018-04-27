@@ -13,9 +13,23 @@ UCLASS()
 class OVERWATCH_API AHeroController : public APlayerController
 {
 	GENERATED_BODY()
+
+private:
+	UPROPERTY()
+	TSubclassOf<class UInGameHUD> InGameHUD_WBP;
+
+	UPROPERTY()
+	UInGameHUD* InGameHUD;
 	
 public:
-	AHeroController();
+	AHeroController(const FObjectInitializer & _objectInit);
 	
+	UFUNCTION()
+	void OnPostLogin();
+
+public:
+
+	// FORCEINLINE ACCESSOR
+	FORCEINLINE UInGameHUD* GetInGameHUD() const { return InGameHUD; }
 	
 };

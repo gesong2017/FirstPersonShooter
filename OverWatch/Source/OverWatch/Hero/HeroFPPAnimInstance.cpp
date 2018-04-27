@@ -21,9 +21,6 @@ void UHeroFPPAnimInstance::UpdateAnimationProperties()
 		AHero* Hero = Cast<AHero>(Pawn);
 		if (Hero)
 		{   
-			// Set Aiming State
-			bIsAiming = Hero->IsHeroAiming();
-
 			// Set Walking State
 			float HeroSpeed = Hero->GetMovementComponent()->Velocity.Size();
 			if (HeroSpeed > 5.0f&&bIsAiming == false)

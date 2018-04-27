@@ -55,7 +55,6 @@ AHero::AHero()
 
 	// Initialize variables here
 	HeroGun = nullptr;
-	bIsAiming = false;
 	NumOfBulletsLeftOnHero = 72;
 }
 
@@ -102,12 +101,9 @@ void AHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &AHero::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AHero::AddControllerYawInput);
 
-	// Bind aim events
-	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Pressed, this, &AHero::StartAiming);
-	PlayerInputComponent->BindAction(TEXT("Aim"), IE_Released, this, &AHero::EndAiming);
-
 	// Bind Fire and Reload Events
-	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AHero::Fire);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AHero::StartFire);
+	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AHero::StopFire);
 	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AHero::Reload);
 }
 
@@ -138,24 +134,25 @@ void AHero::MoveRight(float Value)
 	}
 }
 
-void AHero::StartAiming()
-{
-	bIsAiming = true;
-}
-
-void AHero::EndAiming()
-{
-	bIsAiming = false;
-}
-
-void AHero::Fire()
+void AHero::StartFire()
 {
 	if (HeroGun)
 	{   
 		int32 BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
 		if (BulletsLeftOnGun > 0)
-			HeroGun->Fire();
+			HeroGun->StartFire();
 		else
+			Reload();
+	}
+}
+
+void AHero::StopFire()
+{
+	if (HeroGun)
+	{
+		int32 BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+		HeroGun->StopFire();
+		if (BulletsLeftOnGun == 0)
 			Reload();
 	}
 }

@@ -27,10 +27,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	TSubclassOf<AHeroGun> HeroGun_BP;
 
-	/** Hero aim variable*/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bIsAiming;
-
 	/** Hero default bullets*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	int NumOfBulletsLeftOnHero;
@@ -56,18 +52,13 @@ private:
 
 	void MoveRight(float Value);
 
-	// Functions for player aiming
-	void StartAiming();
-	void EndAiming();
-
 	// Functions for player fire and reload
-	void Fire();
+	void StartFire();
+	void StopFire();
 	void Reload();
 
 public:
 	FRotator GetAimOffsets() const;
 	
-	FORCEINLINE bool IsHeroAiming() const { return bIsAiming; }
-
 	void GetHeroCameraInformation(FVector &outPosition, FRotator &outRotation);
 };
