@@ -10,6 +10,21 @@ UCLASS()
 class OVERWATCH_API ABaseAICharacter : public ACharacter
 {
 	GENERATED_BODY()
+protected:
+	/** AI Behavior Tree */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Behavior Tree")
+	class UBehaviorTree* BehaviorTree;
+
+	/** AI AttributeComponent */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attributes)
+	class UAttributeComponent* AIAttributes;
+
+	/** AI Sensing Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Perception)
+	class UPawnSensingComponent* AIPerception;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
+	bool bIsAlive;
 
 public:
 	// Sets default values for this character's properties
@@ -20,12 +35,17 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FORCEINLINE UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
+	FORCEINLINE UAttributeComponent* GetAIAttributes() const { return AIAttributes; }
+	FORCEINLINE bool IsBotAlive() const { return bIsAlive; }
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+protected:
+	// NPC Get Killed
+	void GetKilled();
 
-	
-	
+	UFUNCTION()
+	virtual void OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser);
+
+	UFUNCTION()
+    void OnPawnSeen(APawn* Pawn);
 };

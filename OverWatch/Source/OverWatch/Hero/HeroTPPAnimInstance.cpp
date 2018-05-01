@@ -11,6 +11,7 @@ UHeroTPPAnimInstance::UHeroTPPAnimInstance(const FObjectInitializer& _objectInit
 	Speed = 0.0f;
 	Direction = 0.0f;
 	bIsJumping = false;
+	bIsAlive = true;
 	Yaw = 0.0f;
 	Pitch = 0.0f;
 }
@@ -50,6 +51,9 @@ void UHeroTPPAnimInstance::UpdateAnimationProperties()
 			// Set AimOffsets variable
 			Yaw = Hero->GetAimOffsets().Yaw;
 			Pitch = Hero->GetAimOffsets().Pitch;
+
+			// Set Player Alive
+			bIsAlive = Hero->IsHeroAlive();
 		}
 	}
 }

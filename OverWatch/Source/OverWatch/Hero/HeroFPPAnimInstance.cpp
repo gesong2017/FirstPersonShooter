@@ -8,7 +8,6 @@ UHeroFPPAnimInstance::UHeroFPPAnimInstance(const FObjectInitializer& _objectInit
 {
 	bIsWalking = false;
 	bIsJumping = false;
-	bIsAiming = false;
 }
 
 void UHeroFPPAnimInstance::UpdateAnimationProperties()
@@ -23,7 +22,7 @@ void UHeroFPPAnimInstance::UpdateAnimationProperties()
 		{   
 			// Set Walking State
 			float HeroSpeed = Hero->GetMovementComponent()->Velocity.Size();
-			if (HeroSpeed > 5.0f&&bIsAiming == false)
+			if (HeroSpeed > 5.0f)
 				bIsWalking = true;
 			else
 				bIsWalking = false;

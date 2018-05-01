@@ -5,21 +5,21 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "AttributeComponent.h"
 #include "ProjectMacroLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Weapons/HeroGun.h"
 #include "ConstructorHelpers.h"
+#include "TimerManager.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimInstance.h"
+#include "HeroFPPAnimInstance.h"
 
 // Sets default values
 AHero::AHero()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-	// Set Hero CapsuleComponent Collision, has nothing to do with damage check
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PICKUP,ECR_Block);
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Intialize the actual mesh that will be seen or acted with other actors in game
 	GetMesh()->bOnlyOwnerSee = false;
@@ -49,6 +49,9 @@ AHero::AHero()
 	FirstPersonMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FirstPersonMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
+	// Create a actor attribute component
+	HeroAttributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("HeroAttributes"));
+
 	// Find hero gun class
 	static ConstructorHelpers::FClassFinder<AHeroGun> HeroGunBlueprint(TEXT("/Game/Blueprints/Weapons/HeroGun_BP"));
 	HeroGun_BP = HeroGunBlueprint.Class;
@@ -56,6 +59,10 @@ AHero::AHero()
 	// Initialize variables here
 	HeroGun = nullptr;
 	NumOfBulletsLeftOnHero = 72;
+	bIsAlive = true;
+	LastFireTime = 0.0f;
+	bCanFire = true;
+	bIsReloading = false;
 }
 
 // Called when the game starts or when spawned
@@ -79,14 +86,9 @@ void AHero::BeginPlay()
 		}
 	}
 		//UE_LOG(LogTemp, Warning, TEXT("HeroGun_BP is not valid"));
+	HeroAttributes->OnHealthChanged.AddDynamic(this, &AHero::OnHealthChanged);
 }
 
-// Called every frame
-void AHero::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 
 // Called to bind functionality to input
 void AHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -138,56 +140,121 @@ void AHero::StartFire()
 {
 	if (HeroGun)
 	{   
-		int32 BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
-		if (BulletsLeftOnGun > 0)
-			HeroGun->StartFire();
-		else
-			Reload();
+		float TimeBetweenShots = HeroGun->GetDeltaTimeBetweenShots();
+		float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
+		GetWorldTimerManager().SetTimer(AutomaticFireTimer, this, &AHero::FireOnce, TimeBetweenShots, true, FirstDelay);
 	}
 }
 
 void AHero::StopFire()
 {
 	if (HeroGun)
-	{
-		int32 BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
-		HeroGun->StopFire();
+	{   
+		int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+		GetWorldTimerManager().ClearTimer(AutomaticFireTimer);
 		if (BulletsLeftOnGun == 0)
+			Reload();
+	}
+}
+
+void AHero::FireOnce()
+{   
+	if (HeroGun && bCanFire == true)
+	{
+		int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+
+		if (BulletsLeftOnGun > 0)
+			HeroGun->Fire();
+
+		else
 			Reload();
 	}
 }
 
 void AHero::Reload()
 {
-	if (HeroGun)
+	if (HeroGun && bIsReloading == false)
 	{   
 		// Check how many bullets left on gun
 		int MaxiumBulletsOnGun = HeroGun->GetMaxiumNumberOfBullets();
 		int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
 
-		// if current number of bullets on gun is less than maxium load and hero still has additional bullets, then we reload
+		// if current number of bullets on gun is less than maxium load and hero still has additional bullets, then we play reload animation montage
 		if (BulletsLeftOnGun < MaxiumBulletsOnGun && NumOfBulletsLeftOnHero > 0)
-		{
-			//check if we can do a full reload
-			int totalNumberOfBullets = BulletsLeftOnGun + NumOfBulletsLeftOnHero;
-			if (totalNumberOfBullets > MaxiumBulletsOnGun)
-			{
-				HeroGun->UpdateCurrentNumberOfBullets(MaxiumBulletsOnGun);
-				int NumOfReloadedBullets = MaxiumBulletsOnGun - BulletsLeftOnGun;
-				NumOfBulletsLeftOnHero = NumOfBulletsLeftOnHero - NumOfReloadedBullets;
-			}
-			else
-			{
-				HeroGun->UpdateCurrentNumberOfBullets(totalNumberOfBullets);
-				NumOfBulletsLeftOnHero = 0;
-			}
-		}
+			StartReload();
 
 		// else, do something to tell player that no bullets left
 		else
 		{
 
 		}
+	}
+}
+
+void AHero::StartReload()
+{   
+	bCanFire = false;
+	bIsReloading = true;
+	float AnimationDuration = PlayReloadAnimMontage();
+	if (AnimationDuration <= 0.0f)
+		AnimationDuration = 0.5f;
+
+	// After Animation is over, stop reload and update bullets on gun
+	GetWorldTimerManager().SetTimer(StopReloadTimer, this, &AHero::StopReload, AnimationDuration, false);
+	GetWorldTimerManager().SetTimer(ReloadGunTimer, this, &AHero::ReloadGun, FMath::Max(0.1f, AnimationDuration - 0.1f), false);
+}
+
+void AHero::StopReload()
+{   
+	bCanFire = true;
+	bIsReloading = false;
+	StopReloadAnimMontage();
+}
+
+void AHero::ReloadGun()
+{   
+	// Check how many bullets left on gun
+	int MaxiumBulletsOnGun = HeroGun->GetMaxiumNumberOfBullets();
+	int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+
+	//check if we can do a full reload
+	int totalNumberOfBullets = BulletsLeftOnGun + NumOfBulletsLeftOnHero;
+	if (totalNumberOfBullets > MaxiumBulletsOnGun)
+	{
+		HeroGun->UpdateCurrentNumberOfBullets(MaxiumBulletsOnGun);
+		int NumOfReloadedBullets = MaxiumBulletsOnGun - BulletsLeftOnGun;
+		NumOfBulletsLeftOnHero = NumOfBulletsLeftOnHero - NumOfReloadedBullets;
+	}
+	else
+	{
+		HeroGun->UpdateCurrentNumberOfBullets(totalNumberOfBullets);
+		NumOfBulletsLeftOnHero = 0;
+	}
+}
+
+void AHero::OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0.0f && bIsAlive == true)
+	{
+		// Die
+		bIsAlive = false;
+		GetMovementComponent()->StopMovementImmediately();
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->bOnlyOwnerSee = true;
+		GetMesh()->bOwnerNoSee = false;
+		FirstPersonMesh->bOnlyOwnerSee = false;
+		FirstPersonMesh->bOwnerNoSee = true;
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.0f);
+
+		// Detach and destroy gun
+		HeroGun->GetWeaponSkeletalMesh()->bOnlyOwnerSee = true;
+		HeroGun->GetWeaponSkeletalMesh()->bOwnerNoSee = false;
+		HeroGun->GetFirstPersonWeaponSkeletalMesh()->bOnlyOwnerSee = false;
+		HeroGun->GetFirstPersonWeaponSkeletalMesh()->bOwnerNoSee = true;
+		HeroGun->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		HeroGun->SetLifeSpan(10.0f);
 	}
 }
 
@@ -202,6 +269,29 @@ void AHero::GetHeroCameraInformation(FVector & outPosition, FRotator & outRotati
 {
 	outPosition = FirstPersonCamera->GetComponentLocation();
 	outRotation = FirstPersonCamera->GetComponentRotation();
+}
+
+float AHero::PlayReloadAnimMontage(float InPlayRate, FName StartSectionName)
+{
+	UHeroFPPAnimInstance* HeroFirstPersonAnimInstance = Cast<UHeroFPPAnimInstance>(FirstPersonMesh->GetAnimInstance());
+	if (HeroFirstPersonAnimInstance)
+	{
+		UAnimMontage* ReloadMontage = HeroFirstPersonAnimInstance->GetReloadAnimMontage();
+		if (ReloadMontage)
+			return HeroFirstPersonAnimInstance->Montage_Play(ReloadMontage, InPlayRate);
+	}
+	return 0.0f;
+}
+
+void AHero::StopReloadAnimMontage()
+{
+	UHeroFPPAnimInstance* HeroFirstPersonAnimInstance = Cast<UHeroFPPAnimInstance>(FirstPersonMesh->GetAnimInstance());
+	if (HeroFirstPersonAnimInstance)
+	{
+		UAnimMontage* ReloadMontage = HeroFirstPersonAnimInstance->GetReloadAnimMontage();
+		if (ReloadMontage)
+			HeroFirstPersonAnimInstance->Montage_Stop(ReloadMontage->BlendOut.GetBlendTime(), ReloadMontage);
+	}
 }
 
 

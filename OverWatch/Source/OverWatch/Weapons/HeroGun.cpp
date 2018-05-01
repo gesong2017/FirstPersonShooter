@@ -11,6 +11,8 @@
 #include "Hero/HeroController.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "TimerManager.h"
+#include "AttributeComponent.h"
+
 
 // Sets default values
 AHeroGun::AHeroGun()
@@ -46,9 +48,7 @@ AHeroGun::AHeroGun()
 	MaxiumNumberOfBullets = 36;
 	CurrentNumberOfBullets = 36;
 	MuzzleSocketName = "MuzzleFlashSocket";
-	GunBaseDamage = 25;
 	GunFireRate = 600.0f;
-	LastFireTime = 0.0f;
 	TimeBetweenShots = 0.0f;
 }
 
@@ -58,18 +58,7 @@ void AHeroGun::BeginPlay()
 	TimeBetweenShots = 60.0f / GunFireRate;
 }
 
-void AHeroGun::StartFire()
-{   
-	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
-	GetWorldTimerManager().SetTimer(AutomaticFireTimer, this, &AHeroGun::FireOnce, TimeBetweenShots, true, FirstDelay);
-}
-
-void AHeroGun::StopFire()
-{
-	GetWorldTimerManager().ClearTimer(AutomaticFireTimer);
-}
-
-void AHeroGun::FireOnce()
+void AHeroGun::Fire()
 {   
 	AHero* Hero = Cast<AHero>(GetOwner());
 	if (Hero)
@@ -113,11 +102,12 @@ void AHeroGun::FireOnce()
 			ABaseAICharacter* AIGotHit = Cast<ABaseAICharacter>(HitResult.GetActor());
 			if (AIGotHit)
 			{   
+				float GunDamage = Hero->GetHeroAttribute()->GetBaseDamage();
 				// Head Shot
 				if (HitPointSurfaceType == SURFACE_FLESHVULNERABLE)
-					GunBaseDamage = 100.0f;
+					GunDamage = 4.0f * GunDamage;
 
-				UGameplayStatics::ApplyPointDamage(AIGotHit, GunBaseDamage, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
+				UGameplayStatics::ApplyPointDamage(AIGotHit, GunDamage, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
 			}
 		}
 
@@ -134,8 +124,7 @@ void AHeroGun::FireOnce()
 			HeroController->ClientPlayCameraShake(FireRecoil);
 
 		// Update the last time we fired
-		LastFireTime = GetWorld()->TimeSeconds;
-
+		Hero->SetLastFireTime(GetWorld()->TimeSeconds);
 	}
 
 }

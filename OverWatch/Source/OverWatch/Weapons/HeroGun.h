@@ -14,10 +14,6 @@ class OVERWATCH_API AHeroGun : public AWeapon
 {
 	GENERATED_BODY()
 private:
-	FTimerHandle AutomaticFireTimer;
-
-	float LastFireTime;
-
 	float TimeBetweenShots;
 
 protected:
@@ -39,9 +35,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	FName MuzzleSocketName;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
-	int GunBaseDamage;
-
 	// Bullets Per Minute Fired
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
 	float GunFireRate;
@@ -53,17 +46,13 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void StartFire();
-	void StopFire();
+	void Fire();
 
 	FORCEINLINE USkeletalMeshComponent* GetFirstPersonWeaponSkeletalMesh() const { return FPPWeaponSkeletalMesh; }
 	FORCEINLINE int GetMaxiumNumberOfBullets() const { return MaxiumNumberOfBullets; }
 	FORCEINLINE int GetCurrentNumberOfBullets() const { return CurrentNumberOfBullets; }
 	FORCEINLINE void UpdateCurrentNumberOfBullets(int NumOfBullets) { CurrentNumberOfBullets = NumOfBullets; }
-	FORCEINLINE int GetGunBaseDamage() const { return GunBaseDamage; }
-
-protected:
-	void FireOnce();
+	FORCEINLINE float GetDeltaTimeBetweenShots() const { return TimeBetweenShots; }
 
 private:
 	void PlayImpactEffectsBasedOnSurfaceType(EPhysicalSurface surfaceType, FVector Location);

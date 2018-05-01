@@ -24,11 +24,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hero Movement")
 	bool bIsJumping;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hero Movement")
+	bool bIsAlive;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimOffsets")
 	float Yaw;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AimOffsets")
 	float Pitch;
+
 	
 public:
 	UHeroTPPAnimInstance(const FObjectInitializer& _objectInitalizer);

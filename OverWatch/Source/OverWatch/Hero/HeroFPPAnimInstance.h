@@ -6,6 +6,7 @@
 #include "BaseAnimInstance.h"
 #include "HeroFPPAnimInstance.generated.h"
 
+class UAnimMontage;
 /**
  * 
  */
@@ -21,11 +22,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hero Movement")
 	bool bIsJumping;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aim")
-	bool bIsAiming;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation Montage")
+	UAnimMontage* ReloadAnimMontage;
 	
 public:
 	UHeroFPPAnimInstance(const FObjectInitializer& _objectInitalizer);
+
+	FORCEINLINE UAnimMontage* GetReloadAnimMontage() const { return ReloadAnimMontage; }
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "UpdateAnimationProperties")
