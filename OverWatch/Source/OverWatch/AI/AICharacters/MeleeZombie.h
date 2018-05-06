@@ -27,6 +27,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
 	bool bIsTargetSet;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Behavior Info")
+	float MaxiumSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Behavior Info")
+	float NormalSpeed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
+	int TimesHitByHero;
+
 public:
 	// Sets default values for this character's properties
 	AMeleeZombie();
