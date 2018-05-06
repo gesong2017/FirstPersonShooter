@@ -8,6 +8,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "ProjectMacroLibrary.h"
+#include "BaseAIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 
 
 // Sets default values
@@ -19,6 +22,7 @@ AMeleeZombie::AMeleeZombie()
 
 	// Initialize Variable
 	HitTimes = 0;
+	bIsTargetSet = false;
 }
 
 // Called when the game starts or when spawned
@@ -29,12 +33,11 @@ void AMeleeZombie::BeginPlay()
 	// Register collision event
 	if (CollisionBox)
 	{
-		CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AMeleeZombie::OnCollisionBoxOverlapBegin);
+		CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AMeleeZombie::OnHit);
 		CollisionBox->bGenerateOverlapEvents = false;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("CollisionBox attach to : %s"), *CollisionBox->GetAttachSocketName().ToString())
-
 }
 
 void AMeleeZombie::OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser)
@@ -45,7 +48,28 @@ void AMeleeZombie::OnHealthChanged(UAttributeComponent* AttributeComp, float Hea
 		UE_LOG(LogTemp, Warning, TEXT("Zombie Health Changed"))
 }
 
-void AMeleeZombie::OnCollisionBoxOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void AMeleeZombie::OnTargetSensed(APawn * Pawn)
+{
+	if (bIsTargetSet == false)
+	{
+		AHero* Hero = Cast<AHero>(Pawn);
+		if (Hero)
+		{   
+			ABaseAIController* BaseAIController = Cast<ABaseAIController>(GetController());
+			if (BaseAIController)
+			{
+				UBlackboardComponent* BlackboardComp = BaseAIController->GetBlackboardComp();
+				if (BlackboardComp)
+				{
+					BlackboardComp->SetValue<UBlackboardKeyType_Object>(BaseAIController->GetKeyID_TargetActor(), Hero);
+					bIsTargetSet = true;
+				}
+			}
+		}
+	}
+}
+
+void AMeleeZombie::OnHit(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {   
 	if (HitTimes == 0)
 	{
@@ -59,3 +83,6 @@ void AMeleeZombie::OnCollisionBoxOverlapBegin(UPrimitiveComponent * OverlappedCo
 		}
 	}
 }
+
+
+

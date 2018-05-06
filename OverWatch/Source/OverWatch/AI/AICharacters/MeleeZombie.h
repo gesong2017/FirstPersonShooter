@@ -15,14 +15,17 @@ class OVERWATCH_API AMeleeZombie : public ABaseAICharacter
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CollisionInfo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Damage Info")
 	class UBoxComponent* CollisionBox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "CollisionInfo")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Damage Info")
 	TSubclassOf<class UDamageType> ZombieDamageType;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "CollisionInfo")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Damage Info")
 	int HitTimes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
+	bool bIsTargetSet;
 
 public:
 	// Sets default values for this character's properties
@@ -40,5 +43,8 @@ protected:
 	void OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser) override;
 
 	UFUNCTION()
-	void OnCollisionBoxOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	void OnTargetSensed(APawn* Pawn);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 };

@@ -3,14 +3,20 @@
 #include "AIBaseAnimInstance.h"
 #include "AI/AICharacters/BaseAICharacter.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "AI/AICharacters/MeleeZombie.h"
-#include "Components/BoxComponent.h"
 
 UAIBaseAnimInstance::UAIBaseAnimInstance(const FObjectInitializer& _objectInitalizer) : Super(_objectInitalizer)
 {
 	// Intialize Variable
 	Speed = 0.0f;
 	bIsAlive = true;
+}
+
+void UAIBaseAnimInstance::Attack()
+{
+}
+
+void UAIBaseAnimInstance::FinishMeleeAttack()
+{
 }
 
 void UAIBaseAnimInstance::UpdateAnimationProperties()
@@ -31,29 +37,3 @@ void UAIBaseAnimInstance::UpdateAnimationProperties()
 	}
 }
 
-void UAIBaseAnimInstance::EnableDamageCollision()
-{
-	AMeleeZombie* Zombie = Cast<AMeleeZombie>(TryGetPawnOwner());
-	if (Zombie)
-	{
-		UBoxComponent* CollisionBox = Zombie->GetCollisionBox();
-		if (CollisionBox)
-			CollisionBox->bGenerateOverlapEvents = true;
-	}
-
-}
-
-void UAIBaseAnimInstance::DisableDamageCollision()
-{
-	AMeleeZombie* Zombie = Cast<AMeleeZombie>(TryGetPawnOwner());
-	if (Zombie)
-	{
-		UBoxComponent* CollisionBox = Zombie->GetCollisionBox();
-		if (CollisionBox)
-		{
-			CollisionBox->bGenerateOverlapEvents = false;
-			Zombie->ResetHitTimes();
-		}
-	}
-
-}

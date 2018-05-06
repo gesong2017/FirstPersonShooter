@@ -11,20 +11,19 @@ class OVERWATCH_API ABaseAICharacter : public ACharacter
 {
 	GENERATED_BODY()
 protected:
-	/** AI Behavior Tree */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Behavior Tree")
-	class UBehaviorTree* BehaviorTree;
+	/** Pawn Sensing Component */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Sensing")
+	class UPawnSensingComponent* PawnSensing;
 
 	/** AI AttributeComponent */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attributes)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Attributes")
 	class UAttributeComponent* AIAttributes;
 
-	/** AI Sensing Component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Perception)
-	class UPawnSensingComponent* AIPerception;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI State")
 	bool bIsAlive;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI Behavior")
+	class UBehaviorTree* BotBehaviorTree;
 
 public:
 	// Sets default values for this character's properties
@@ -35,9 +34,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	FORCEINLINE UBehaviorTree* GetBehaviorTree() const { return BehaviorTree; }
 	FORCEINLINE UAttributeComponent* GetAIAttributes() const { return AIAttributes; }
 	FORCEINLINE bool IsBotAlive() const { return bIsAlive; }
+	FORCEINLINE UBehaviorTree* GetBotBehaviorTree() const { return BotBehaviorTree; }
 
 protected:
 	// NPC Get Killed
@@ -47,5 +46,5 @@ protected:
 	virtual void OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser);
 
 	UFUNCTION()
-    void OnPawnSeen(APawn* Pawn);
+	virtual void OnTargetSensed(APawn* Pawn);
 };

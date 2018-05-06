@@ -8,7 +8,6 @@
 #include "AttributeComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
-#include "BehaviorTree/BlackboardComponent.h"
 
 // Sets default values
 ABaseAICharacter::ABaseAICharacter()
@@ -31,11 +30,11 @@ ABaseAICharacter::ABaseAICharacter()
 	GetMesh()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(COLLISION_PICKUP, ECR_Ignore);
 
-	// Create a actor attribute component
-	AIAttributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("HeroAttributes"));
+	// Create an actor attribute component
+	AIAttributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("AIAttributes"));
 
-	// Create a ai sensing component
-	AIPerception = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("AI Perception"));
+	// Create and Initialize Pawn Sensing Component
+	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
 
 	// Initialize Variables
 	bIsAlive = true;
@@ -46,9 +45,9 @@ void ABaseAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// bind delegates to our own function
 	AIAttributes->OnHealthChanged.AddDynamic(this, &ABaseAICharacter::OnHealthChanged);
-	AIPerception->OnSeePawn.AddDynamic(this, &ABaseAICharacter::OnPawnSeen);
-	
+	PawnSensing->OnSeePawn.AddDynamic(this, &ABaseAICharacter::OnTargetSensed);
 }
 
 void ABaseAICharacter::GetKilled()
@@ -62,19 +61,11 @@ void ABaseAICharacter::GetKilled()
 	SetLifeSpan(10.0f);
 }
 
-void ABaseAICharacter::OnPawnSeen(APawn* Pawn)
-{   
-	// Update Blackboard data
-	if (BehaviorTree)
-	{   
-		ABaseAIController* AIController = Cast<ABaseAIController>(GetController());
-		if (AIController)
-			AIController->GetBlackboardComp()->SetValueAsObject("Target", Pawn);
-	}
-}
-
 void ABaseAICharacter::OnHealthChanged(UAttributeComponent * AttributeComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * IntigatedBy, AActor * DamageCauser)
 {
 }
 
+void ABaseAICharacter::OnTargetSensed(APawn * Pawn)
+{
+}
 

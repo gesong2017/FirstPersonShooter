@@ -13,18 +13,29 @@ UCLASS()
 class OVERWATCH_API ABaseAIController : public AAIController
 {
 	GENERATED_BODY()
-	
-private:
-	UPROPERTY(transient)
-	class UBehaviorTreeComponent* BehaviorTreeComp;
 
+private:
+	// Blackboard variable keyid
+	uint8 TargetKeyID;
+	uint8 DistanceSqrToTargetKeyID;
+
+protected:
 	UPROPERTY(transient)
 	class UBlackboardComponent* BlackboardComp;
 
+	UPROPERTY(transient)
+	class UBehaviorTreeComponent* BehaviorTreeComp;
+	
 public:
 	ABaseAIController();
-	
-	virtual void Possess(APawn* InPawn) override;
 
+	void Possess(APawn* InPawn) override;
+
+public:
 	FORCEINLINE UBlackboardComponent* GetBlackboardComp() const { return BlackboardComp; }
+	FORCEINLINE UBehaviorTreeComponent* GetBehaviorTreeComp() const { return BehaviorTreeComp; }
+
+	// Get Key ID of variable in blackboard
+	FORCEINLINE uint8 GetKeyID_TargetActor() const { return TargetKeyID; }
+	FORCEINLINE uint8 GetKeyID_DistanceSqrToTarget() const { return DistanceSqrToTargetKeyID; }
 };

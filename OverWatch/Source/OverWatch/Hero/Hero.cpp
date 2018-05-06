@@ -104,6 +104,7 @@ void AHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &AHero::AddControllerYawInput);
 
 	// Bind Fire and Reload Events
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &AHero::StartFire);
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Released, this, &AHero::StopFire);
 	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AHero::Reload);

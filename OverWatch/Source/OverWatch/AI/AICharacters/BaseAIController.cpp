@@ -9,24 +9,29 @@
 
 ABaseAIController::ABaseAIController()
 {
+	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackboardComp"));
 	BehaviorTreeComp = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("BehaviorTreeComp"));
-	BlackboardComp = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackBoardComp"));
 }
 
 void ABaseAIController::Possess(APawn * InPawn)
 {
 	Super::Possess(InPawn);
 
-	// 
+	// cast possessed pawn to base ai character
 	ABaseAICharacter* AICharacter = Cast<ABaseAICharacter>(InPawn);
-	UBehaviorTree* AIBehaviorTree = AICharacter->GetBehaviorTree();
-	if (AICharacter && AIBehaviorTree)
-	{   
-		// Initialize AI Behavior Tree and blackboard
-		BlackboardComp->InitializeBlackboard(*AIBehaviorTree->BlackboardAsset);
-		BehaviorTreeComp->StartTree(*AIBehaviorTree);
-	}
+	UBehaviorTree* BotBehaviorTree = AICharacter->GetBotBehaviorTree();
+	if (AICharacter && BotBehaviorTree)
+	{
+		// Initialize Blackboard component
+		BlackboardComp->InitializeBlackboard(*BotBehaviorTree->BlackboardAsset);
 
+		// store variable in BB to our keyid
+		TargetKeyID = BlackboardComp->GetKeyID(TEXT("Target"));
+		DistanceSqrToTargetKeyID= BlackboardComp->GetKeyID(TEXT("DistanceSqrToTarget"));
+
+		// Run Behavior Tree
+		BehaviorTreeComp->StartTree(*BotBehaviorTree);
+	}
 }
 
 

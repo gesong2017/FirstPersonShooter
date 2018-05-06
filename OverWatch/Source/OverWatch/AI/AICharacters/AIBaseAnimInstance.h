@@ -6,6 +6,7 @@
 #include "BaseAnimInstance.h"
 #include "AIBaseAnimInstance.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnFinishMeleeAttackSignature, class UBehaviorTreeComponent*);
 /**
  * 
  */
@@ -21,16 +22,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Movement")
 	bool bIsAlive;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
+	UAnimMontage* MeleeAttackMontage;
+
 public:
 	UAIBaseAnimInstance(const FObjectInitializer& _objectInitalizer);
 
+	virtual void Attack();
+
+	// Called When Attack Sequence is done by the end of animation sequence
+	virtual void FinishMeleeAttack();
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "UpdateAnimationProperties")
-	void UpdateAnimationProperties() override;
+	virtual void UpdateAnimationProperties() override;
 
-	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
-	void EnableDamageCollision();
-
-	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
-	void DisableDamageCollision();
+public:
+	FOnFinishMeleeAttackSignature OnFinishMeleeAttack;
 };
