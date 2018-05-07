@@ -105,7 +105,10 @@ void AHeroGun::Fire()
 				float GunDamage = Hero->GetHeroAttribute()->GetBaseDamage();
 				// Head Shot
 				if (HitPointSurfaceType == SURFACE_FLESHVULNERABLE)
+				{
 					GunDamage = 4.0f * GunDamage;
+					UE_LOG(LogTemp, Warning, TEXT("Head Shot"))
+				}
 
 				UGameplayStatics::ApplyPointDamage(AIGotHit, GunDamage, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
 			}

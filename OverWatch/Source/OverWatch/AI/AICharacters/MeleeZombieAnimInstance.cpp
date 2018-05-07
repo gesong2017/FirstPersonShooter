@@ -40,7 +40,7 @@ void UMeleeZombieAnimInstance::DisableDamageCollision()
 	}
 }
 
-void UMeleeZombieAnimInstance::Attack()
+void UMeleeZombieAnimInstance::MeleeAttack()
 {   
 	if (MeleeAttackMontage)
 	{   

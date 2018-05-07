@@ -22,13 +22,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Movement")
 	bool bIsAlive;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
-	UAnimMontage* MeleeAttackMontage;
-
 public:
 	UAIBaseAnimInstance(const FObjectInitializer& _objectInitalizer);
-
-	virtual void Attack();
 
 	// Called When Attack Sequence is done by the end of animation sequence
 	virtual void FinishMeleeAttack();

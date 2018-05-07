@@ -14,7 +14,19 @@ class OVERWATCH_API UInGameHUD : public UUserWidget
 {
 	GENERATED_BODY()
 	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* HealthBar;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HealthValue;
+
+public:
+	UInGameHUD(const FObjectInitializer& objInit);
+
+protected:
+	bool Initialize() override;
 	
-	
-	
+public:
+	void UpdateHealthValueAndProgressBar(float CurrentHealth);
 };

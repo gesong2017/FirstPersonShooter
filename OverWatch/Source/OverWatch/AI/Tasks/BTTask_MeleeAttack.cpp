@@ -3,7 +3,7 @@
 #include "BTTask_MeleeAttack.h"
 #include "AI/AICharacters/BaseAIController.h"
 #include "AI/AICharacters/BaseAICharacter.h"
-#include "AI/AICharacters/AIBaseAnimInstance.h"
+#include "AI/AICharacters/MeleeZombieAnimInstance.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 
@@ -23,7 +23,7 @@ EBTNodeResult::Type UBTTask_MeleeAttack::ExecuteTask(UBehaviorTreeComponent & Ow
 	if (AICharacter == nullptr)
 		return NodeResult;
 
-	UAIBaseAnimInstance* AIAnimInstance = Cast<UAIBaseAnimInstance>(AICharacter->GetMesh()->GetAnimInstance());
+	UMeleeZombieAnimInstance* AIAnimInstance = Cast<UMeleeZombieAnimInstance>(AICharacter->GetMesh()->GetAnimInstance());
 	if (AIAnimInstance == nullptr)
 		return NodeResult;
 
@@ -43,7 +43,7 @@ EBTNodeResult::Type UBTTask_MeleeAttack::ExecuteTask(UBehaviorTreeComponent & Ow
 	{   
 		NodeResult = EBTNodeResult::InProgress;
 		AIAnimInstance->OnFinishMeleeAttack.BindUObject(this, &UBTTask_MeleeAttack::OnFinishAttackHandle);
-		AIAnimInstance->Attack();
+		AIAnimInstance->MeleeAttack();
 		return NodeResult;
 	}
 

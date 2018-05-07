@@ -11,10 +11,6 @@ UAIBaseAnimInstance::UAIBaseAnimInstance(const FObjectInitializer& _objectInital
 	bIsAlive = true;
 }
 
-void UAIBaseAnimInstance::Attack()
-{
-}
-
 void UAIBaseAnimInstance::FinishMeleeAttack()
 {
 }

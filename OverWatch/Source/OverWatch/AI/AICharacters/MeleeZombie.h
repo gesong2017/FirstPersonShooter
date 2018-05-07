@@ -52,7 +52,7 @@ protected:
 	void OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser) override;
 
 	UFUNCTION()
-	void OnTargetSensed(APawn* Pawn);
+	void OnTargetSensed(APawn* Pawn) override;
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);

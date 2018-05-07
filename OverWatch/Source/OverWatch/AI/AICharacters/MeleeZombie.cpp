@@ -7,8 +7,6 @@
 #include "AttributeComponent.h"
 #include "Hero/Hero.h"
 #include "Kismet/GameplayStatics.h"
-#include "PhysicalMaterials/PhysicalMaterial.h"
-#include "ProjectMacroLibrary.h"
 #include "BaseAIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"

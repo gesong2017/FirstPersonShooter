@@ -14,6 +14,8 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimInstance.h"
 #include "HeroFPPAnimInstance.h"
+#include "HeroController.h"
+#include "UI/InGameHUD.h"
 
 // Sets default values
 AHero::AHero()
@@ -234,7 +236,12 @@ void AHero::ReloadGun()
 }
 
 void AHero::OnHealthChanged(UAttributeComponent* AttributeComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* IntigatedBy, AActor* DamageCauser)
-{
+{   
+	// Update UI
+	AHeroController* HeroController = Cast<AHeroController>(GetController());
+	if (HeroController)
+		HeroController->GetInGameHUD()->UpdateHealthValueAndProgressBar(Health);
+
 	if (Health <= 0.0f && bIsAlive == true)
 	{
 		// Die

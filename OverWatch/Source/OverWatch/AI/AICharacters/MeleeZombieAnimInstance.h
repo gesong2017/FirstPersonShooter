@@ -14,6 +14,10 @@ class OVERWATCH_API UMeleeZombieAnimInstance : public UAIBaseAnimInstance
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
+	UAnimMontage* MeleeAttackMontage;
+
 public:
 	UMeleeZombieAnimInstance(const FObjectInitializer& _objectInitalizer);
 
@@ -28,7 +32,7 @@ protected:
 	void DisableDamageCollision();
 
 public:
-	void Attack() override;
+	void MeleeAttack();
 
 	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
 	void FinishMeleeAttack() override;
