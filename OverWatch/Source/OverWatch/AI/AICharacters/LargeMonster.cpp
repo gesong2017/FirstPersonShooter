@@ -107,10 +107,3 @@ void ALargeMonster::OnHit(UPrimitiveComponent * OverlappedComponent, AActor * Ot
 	}
 }
 
-void ALargeMonster::DoRadialDamge()
-{   
-	FVector LeftHandPosition = GetMesh()->GetSocketLocation(TEXT("LeftHand"));
-	FVector RightHandPosition = GetMesh()->GetSocketLocation(TEXT("RightHand"));
-	FVector RadialCenter = (LeftHandPosition + RightHandPosition) * 0.5f;
-	//UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), GetAIAttributes()->GetBaseDamage(), 100.0f, RadialCenter, 300.0f, 600.0f, 100.0f, MonsterDamageType);
-}

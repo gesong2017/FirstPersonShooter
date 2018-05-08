@@ -28,6 +28,10 @@ void ABaseAIController::Possess(APawn * InPawn)
 		// store variable in BB to our keyid
 		TargetKeyID = BlackboardComp->GetKeyID(TEXT("Target"));
 		DistanceSqrToTargetKeyID= BlackboardComp->GetKeyID(TEXT("DistanceSqrToTarget"));
+		DistanceToTargetKeyID = BlackboardComp->GetKeyID(TEXT("DistanceToTarget"));
+
+		// Initialize Distance To Avoid Entering into Wrong Condition Check
+		BlackboardComp->SetValue<UBlackboardKeyType_Float>(DistanceToTargetKeyID, 10000.0f);
 
 		// Run Behavior Tree
 		BehaviorTreeComp->StartTree(*BotBehaviorTree);

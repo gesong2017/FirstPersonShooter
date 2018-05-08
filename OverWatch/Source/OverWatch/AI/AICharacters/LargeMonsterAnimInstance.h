@@ -22,9 +22,6 @@ protected:
 	UAnimMontage* MeleeAttackMontage_02;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
-	UAnimMontage* JumpAttackMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
 	UAnimMontage* RangeAttackMontage;
 
 public:
@@ -46,15 +43,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
 	void DisableRightHandDamageCollision();
 	
-	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
-	void TriggerJumpAttackRadialDamage();
-
 public:
 	void MeleeAttack01();
 
 	void MeleeAttack02();
-
-	void JumpAttack();
 
 	void RangeAttack();
 

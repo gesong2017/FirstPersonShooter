@@ -64,13 +64,6 @@ void ULargeMonsterAnimInstance::DisableRightHandDamageCollision()
 	}
 }
 
-void ULargeMonsterAnimInstance::TriggerJumpAttackRadialDamage()
-{
-	ALargeMonster* LargeMonster = Cast<ALargeMonster>(TryGetPawnOwner());
-	if (LargeMonster)
-		LargeMonster->DoRadialDamge();
-}
-
 void ULargeMonsterAnimInstance::MeleeAttack01()
 {
 	if (MeleeAttackMontage_01)
@@ -86,15 +79,6 @@ void ULargeMonsterAnimInstance::MeleeAttack02()
 	{
 		Montage_Play(MeleeAttackMontage_02);
 		UE_LOG(LogTemp, Warning, TEXT("Monster is Swiping"))
-	}
-}
-
-void ULargeMonsterAnimInstance::JumpAttack()
-{
-	if (JumpAttackMontage)
-	{
-		Montage_Play(JumpAttackMontage);
-		UE_LOG(LogTemp, Warning, TEXT("Monster is jump attacking"))
 	}
 }
 

@@ -18,6 +18,7 @@ private:
 	// Blackboard variable keyid
 	uint8 TargetKeyID;
 	uint8 DistanceSqrToTargetKeyID;
+	uint8 DistanceToTargetKeyID;
 
 protected:
 	UPROPERTY(transient)
@@ -38,4 +39,5 @@ public:
 	// Get Key ID of variable in blackboard
 	FORCEINLINE uint8 GetKeyID_TargetActor() const { return TargetKeyID; }
 	FORCEINLINE uint8 GetKeyID_DistanceSqrToTarget() const { return DistanceSqrToTargetKeyID; }
+	FORCEINLINE uint8 GetKeyID_DistanceToTarget() const { return DistanceToTargetKeyID; }
 };
