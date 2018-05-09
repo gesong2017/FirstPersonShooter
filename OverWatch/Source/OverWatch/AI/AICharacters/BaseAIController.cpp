@@ -29,6 +29,7 @@ void ABaseAIController::Possess(APawn * InPawn)
 		TargetKeyID = BlackboardComp->GetKeyID(TEXT("Target"));
 		DistanceSqrToTargetKeyID= BlackboardComp->GetKeyID(TEXT("DistanceSqrToTarget"));
 		DistanceToTargetKeyID = BlackboardComp->GetKeyID(TEXT("DistanceToTarget"));
+		ClosestPickupKeyID = BlackboardComp->GetKeyID(TEXT("ClosestPickup"));
 
 		// Initialize Distance To Avoid Entering into Wrong Condition Check
 		BlackboardComp->SetValue<UBlackboardKeyType_Float>(DistanceToTargetKeyID, 10000.0f);

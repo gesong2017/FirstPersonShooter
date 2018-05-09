@@ -166,7 +166,7 @@ void AHero::FireOnce()
 	{
 		int BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
 
-		if (BulletsLeftOnGun > 0)
+		if (BulletsLeftOnGun > 0) 
 			HeroGun->Fire();
 
 		else
@@ -232,6 +232,18 @@ void AHero::ReloadGun()
 	{
 		HeroGun->UpdateCurrentNumberOfBullets(totalNumberOfBullets);
 		NumOfBulletsLeftOnHero = 0;
+	}
+
+	// Update UI
+	AHeroController* HeroController = Cast<AHeroController>(GetController());
+	if (HeroController)
+	{   
+		// Update Number Of Bullets Displayed On Gun
+		BulletsLeftOnGun = HeroGun->GetCurrentNumberOfBullets();
+		HeroController->GetInGameHUD()->UpdateNumOfBulletsOnGun(BulletsLeftOnGun);
+
+		// Update Number Of Bullets Displayed In Player's Bag
+		HeroController->GetInGameHUD()->UpdateNumOfBulletsOnHero(NumOfBulletsLeftOnHero);
 	}
 }
 

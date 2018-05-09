@@ -40,6 +40,7 @@ public:
 	FORCEINLINE void SetCurrentHealth(float Health) { CurrentHealth = Health; }
 	FORCEINLINE float GetBaseDamage() const { return BaseDamage; }
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+	FORCEINLINE float GetMaxiumHealth() const { return MaxiumHealth; }
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")

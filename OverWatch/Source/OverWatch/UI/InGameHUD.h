@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "InGameHUD.generated.h"
 
+class UProgressBar;
+class UTextBlock;
 /**
  * 
  */
@@ -16,10 +18,16 @@ class OVERWATCH_API UInGameHUD : public UUserWidget
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
-	class UProgressBar* HealthBar;
+	UProgressBar* HealthBar;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* HealthValue;
+	UTextBlock* HealthValue;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* NumOfBulletsOnGun;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* NumOfBulletsOnHero;
 
 public:
 	UInGameHUD(const FObjectInitializer& objInit);
@@ -29,4 +37,8 @@ protected:
 	
 public:
 	void UpdateHealthValueAndProgressBar(float CurrentHealth);
+
+	void UpdateNumOfBulletsOnGun(int CurrentBullet);
+
+	void UpdateNumOfBulletsOnHero(int CurrentBullet);
 };

@@ -98,4 +98,6 @@ public:
 	FORCEINLINE UAttributeComponent* GetHeroAttribute() const { return HeroAttributes;}
 	FORCEINLINE bool IsHeroAlive() const { return bIsAlive; }
 	FORCEINLINE void SetLastFireTime(float NewTime) { LastFireTime = NewTime; }
+	FORCEINLINE int GetNumOfBulletsLeftOnHero() const { return NumOfBulletsLeftOnHero; }
+	FORCEINLINE void UpdateNumOfBulletsLeftOnHero(int TotalNumOfBullets) { NumOfBulletsLeftOnHero = TotalNumOfBullets; }
 };

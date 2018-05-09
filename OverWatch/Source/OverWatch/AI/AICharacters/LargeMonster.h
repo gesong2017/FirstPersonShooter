@@ -30,6 +30,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
 	bool bIsTargetSet;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
+	TArray<AActor*> Stones;
+
 public:
 	// Sets default values for this character's properties
 	ALargeMonster();
@@ -37,6 +40,7 @@ public:
 	FORCEINLINE UBoxComponent* GetLeftHandCollisionBox() const { return LeftHand; }
 	FORCEINLINE UBoxComponent* GetRightHandCollisionBox() const { return RightHand; }
 	FORCEINLINE void ResetHitTimes() { HitTimes = 0; }
+	FORCEINLINE TArray<AActor*> GetAllStones() const { return Stones; }
 
 protected:
 	// Called when the game starts or when spawned
@@ -51,4 +55,13 @@ protected:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+public:
+	AActor* GetClosestStoneByManhattanDistance();
+
+	int GetIndexOfStone(AActor* TargetActor);
+
+	void Pickup();
+
+	void Throw();
 };

@@ -42,6 +42,12 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
 	void DisableRightHandDamageCollision();
+
+	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
+	void GrabStone();
+
+	UFUNCTION(BlueprintCallable, Category = "Anim NotifyEvents")
+	void ThrowStone();
 	
 public:
 	void MeleeAttack01();

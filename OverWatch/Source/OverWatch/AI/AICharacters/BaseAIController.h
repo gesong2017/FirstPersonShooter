@@ -19,6 +19,7 @@ private:
 	uint8 TargetKeyID;
 	uint8 DistanceSqrToTargetKeyID;
 	uint8 DistanceToTargetKeyID;
+	uint8 ClosestPickupKeyID;
 
 protected:
 	UPROPERTY(transient)
@@ -40,4 +41,5 @@ public:
 	FORCEINLINE uint8 GetKeyID_TargetActor() const { return TargetKeyID; }
 	FORCEINLINE uint8 GetKeyID_DistanceSqrToTarget() const { return DistanceSqrToTargetKeyID; }
 	FORCEINLINE uint8 GetKeyID_DistanceToTarget() const { return DistanceToTargetKeyID; }
+	FORCEINLINE uint8 GetKeyID_ClosestPickup() const { return ClosestPickupKeyID; }
 };

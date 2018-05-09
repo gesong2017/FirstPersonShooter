@@ -12,6 +12,8 @@
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "TimerManager.h"
 #include "AttributeComponent.h"
+#include "UI/InGameHUD.h"
+#include "Projectiles/DestructibleProjectile.h"
 
 
 // Sets default values
@@ -100,6 +102,7 @@ void AHeroGun::Fire()
 
 			// check if the bullet hit an ai character or other stuff
 			ABaseAICharacter* AIGotHit = Cast<ABaseAICharacter>(HitResult.GetActor());
+			ADestructibleProjectile* ObjectGotHit = Cast<ADestructibleProjectile>(HitResult.GetActor());
 			if (AIGotHit)
 			{   
 				float GunDamage = Hero->GetHeroAttribute()->GetBaseDamage();
@@ -112,6 +115,14 @@ void AHeroGun::Fire()
 
 				UGameplayStatics::ApplyPointDamage(AIGotHit, GunDamage, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
 			}
+
+			if (ObjectGotHit)
+			{
+				if (ObjectGotHit->GetIsDestructible() == true)
+					UGameplayStatics::ApplyPointDamage(ObjectGotHit, 1.0f, ShotDirection, HitResult, Hero->GetInstigatorController(), this, DamageType);
+				else
+					UE_LOG(LogTemp, Warning, TEXT("Hitted Projectile, But it is not destructible yet"))
+			}
 		}
 
 		// Spawn a bullet trail anyway if we didn't hit anything
@@ -121,13 +132,18 @@ void AHeroGun::Fire()
 		if (TrailComp)
 			TrailComp->SetVectorParameter(TEXT("BeamEnd"), TraceEnd);
 
-		// Simulate Fire Recoil use camera shake
+		// Simulate Fire Recoil use camera shake and Update UI
 		AHeroController* HeroController = Cast<AHeroController>(Hero->GetController());
 		if (HeroController&&FireRecoil)
+		{
 			HeroController->ClientPlayCameraShake(FireRecoil);
+			HeroController->GetInGameHUD()->UpdateNumOfBulletsOnGun(CurrentNumberOfBullets);
+		}
 
 		// Update the last time we fired
 		Hero->SetLastFireTime(GetWorld()->TimeSeconds);
+
+
 	}
 
 }

@@ -64,6 +64,20 @@ void ULargeMonsterAnimInstance::DisableRightHandDamageCollision()
 	}
 }
 
+void ULargeMonsterAnimInstance::GrabStone()
+{
+	ALargeMonster* LargeMonster = Cast<ALargeMonster>(TryGetPawnOwner());
+	if (LargeMonster)
+		LargeMonster->Pickup();
+}
+
+void ULargeMonsterAnimInstance::ThrowStone()
+{
+	ALargeMonster* LargeMonster = Cast<ALargeMonster>(TryGetPawnOwner());
+	if (LargeMonster)
+		LargeMonster->Throw();
+}
+
 void ULargeMonsterAnimInstance::MeleeAttack01()
 {
 	if (MeleeAttackMontage_01)
