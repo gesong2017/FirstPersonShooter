@@ -2,7 +2,6 @@
 
 #include "AIBaseAnimInstance.h"
 #include "AI/AICharacters/BaseAICharacter.h"
-#include "GameFramework/PawnMovementComponent.h"
 
 UAIBaseAnimInstance::UAIBaseAnimInstance(const FObjectInitializer& _objectInitalizer) : Super(_objectInitalizer)
 {

@@ -93,7 +93,7 @@ void ADestructibleProjectile::OnFinishFlying(const FHitResult & ImpactResult)
 {
 	// Diable Damage To Hero and Set
 	UE_LOG(LogTemp, Warning, TEXT("Projectile Has finished flying"))
-    
+
 	// Reset Variables
 	bIsDestructible = false;
 	bCanDamageHero = false;
@@ -108,7 +108,7 @@ void ADestructibleProjectile::IntializeProjectile(AActor * TargetActor)
 	// Activate Projectile Movement Comp and Initialize it
 	ProjectileMovementComp->SetActive(true);
 	FVector ShotDirection = TargetActor->GetActorLocation() - GetActorLocation();
-	ProjectileMovementComp->Velocity = ShotDirection.GetSafeNormal()*ProjectileMovementComp->InitialSpeed;
+	ProjectileMovementComp->Velocity = ShotDirection.GetSafeNormal() * ProjectileMovementComp->InitialSpeed;
 	DrawDebugLine(GetWorld(), GetActorLocation(), TargetActor->GetActorLocation(), FColor::Red, false, 10.0f, 0, 5.0f);
 	bIsDestructible = true;
 	bCanDamageHero = true;

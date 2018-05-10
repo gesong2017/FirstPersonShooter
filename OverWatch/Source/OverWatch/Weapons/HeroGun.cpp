@@ -22,7 +22,7 @@ AHeroGun::AHeroGun()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	// Initialize fpp weapon mesh component
+	// Initialize tpp weapon mesh component
 	WeaponSkeletalMesh->bOnlyOwnerSee = false;
 	WeaponSkeletalMesh->bOwnerNoSee = true;
 	WeaponSkeletalMesh->MeshComponentUpdateFlag = EMeshComponentUpdateFlag::OnlyTickPoseWhenRendered;
