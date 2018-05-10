@@ -18,6 +18,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Movement")
 	float Direction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Movement")
+	float AimAngle;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Anim Montages")
 	UAnimMontage* FireMontage;
 

@@ -27,7 +27,7 @@ EBTNodeResult::Type UBTTask_MonsterMeleeAttackCombo::ExecuteTask(UBehaviorTreeCo
 	if (AIAnimInstance == nullptr)
 		return NodeResult;
 
-	const AActor* const TargetActor = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(AIController->GetKeyID_TargetActor()));
+	AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(AIController->GetKeyID_TargetActor()));
 	if (TargetActor == nullptr)
 		return NodeResult;
 
@@ -42,6 +42,7 @@ EBTNodeResult::Type UBTTask_MonsterMeleeAttackCombo::ExecuteTask(UBehaviorTreeCo
 	{
 		NodeResult = EBTNodeResult::InProgress;
 		AIAnimInstance->OnFinishMeleeAttack.BindUObject(this, &UBTTask_MonsterMeleeAttackCombo::OnFinishAttackHandle);
+		AIController->SetFocus(TargetActor);
 
 		// Use different attack animation based on the distance
 		if (DistanceToTarget <= SwipingAttackDistance && DistanceToTarget > PunchingAttackDistance)

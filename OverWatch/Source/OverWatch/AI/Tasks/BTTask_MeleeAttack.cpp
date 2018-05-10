@@ -27,7 +27,7 @@ EBTNodeResult::Type UBTTask_MeleeAttack::ExecuteTask(UBehaviorTreeComponent & Ow
 	if (AIAnimInstance == nullptr)
 		return NodeResult;
 
-	const AActor* const TargetActor = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(AIController->GetKeyID_TargetActor()));
+	AActor* TargetActor = Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(AIController->GetKeyID_TargetActor()));
 	if (TargetActor == nullptr)
 		return NodeResult;
 

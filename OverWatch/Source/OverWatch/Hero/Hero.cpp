@@ -23,6 +23,10 @@ AHero::AHero()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
+	// Change Hero CapsuleComponent collision
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_WEAPON, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
+
 	// Intialize the actual mesh that will be seen or acted with other actors in game
 	GetMesh()->bOnlyOwnerSee = false;
 	GetMesh()->bOwnerNoSee = true;

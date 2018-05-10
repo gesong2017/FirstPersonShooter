@@ -34,6 +34,7 @@ EBTNodeResult::Type UBTTask_Fire::ExecuteTask(UBehaviorTreeComponent& OwnerComp,
 
 	// Fire!
 	NodeResult = EBTNodeResult::InProgress;
+	AIController->SetFocus(TargetActor);
 	NormalRangeTrooperAnimInstance->OnFinishMeleeAttack.BindUObject(this, &UBTTask_Fire::OnFinishFireHandle);
 	NormalRangeTrooperAnimInstance->Fire();
 	NormalRangeTrooper->Fire(TargetActor);

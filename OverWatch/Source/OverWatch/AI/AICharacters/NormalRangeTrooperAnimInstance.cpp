@@ -9,6 +9,7 @@ UNormalRangeTrooperAnimInstance::UNormalRangeTrooperAnimInstance(const FObjectIn
 {
 	// Intialize Variable
 	Direction = 0.0f;
+	AimAngle = 0.0f;
 }
 
 void UNormalRangeTrooperAnimInstance::UpdateAnimationProperties()
@@ -38,6 +39,10 @@ void UNormalRangeTrooperAnimInstance::UpdateAnimationProperties()
 				else
 					Direction = TranslatedRotator.Yaw;
 			}
+
+			// Update Aim Angle
+			AimAngle = NPC->GetControlRotation().Pitch;
+			UE_LOG(LogTemp, Warning, TEXT("Aim Angle : %f"), AimAngle)
 
 			// Set AI Alive state
 			bIsAlive = NPC->IsBotAlive();
