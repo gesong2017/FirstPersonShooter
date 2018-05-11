@@ -6,7 +6,6 @@
 #include "Hero/Hero.h"
 #include "AI/AICharacters/LargeMonster.h"
 #include "Kismet/GameplayStatics.h"
-#include "DrawDebugHelpers.h"
 
 // Sets default values
 ADestructibleProjectile::ADestructibleProjectile()
@@ -109,7 +108,6 @@ void ADestructibleProjectile::IntializeProjectile(AActor * TargetActor)
 	ProjectileMovementComp->SetActive(true);
 	FVector ShotDirection = TargetActor->GetActorLocation() - GetActorLocation();
 	ProjectileMovementComp->Velocity = ShotDirection.GetSafeNormal() * ProjectileMovementComp->InitialSpeed;
-	DrawDebugLine(GetWorld(), GetActorLocation(), TargetActor->GetActorLocation(), FColor::Red, false, 10.0f, 0, 5.0f);
 	bIsDestructible = true;
 	bCanDamageHero = true;
 }

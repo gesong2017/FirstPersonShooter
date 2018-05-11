@@ -13,7 +13,7 @@ ANormalProjectile::ANormalProjectile()
 
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-
+	CollisionComp->OnComponentHit.AddDynamic(this, &ANormalProjectile::OnHit);
 	// Set as root component
 	RootComponent = CollisionComp;
 
@@ -31,13 +31,12 @@ ANormalProjectile::ANormalProjectile()
 void ANormalProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// set up a notification for when this component hits something blocking
-	CollisionComp->OnComponentHit.AddDynamic(this, &ANormalProjectile::OnHit);
 }
 
-void ANormalProjectile::OnHit(UPrimitiveComponent * HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
+void ANormalProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {
 }
+
+
 
 

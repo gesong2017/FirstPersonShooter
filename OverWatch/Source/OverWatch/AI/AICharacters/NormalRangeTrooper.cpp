@@ -13,9 +13,12 @@
 // Sets default values
 ANormalRangeTrooper::ANormalRangeTrooper()
 {   
-	// Find hero gun class
-	static ConstructorHelpers::FClassFinder<AAIGun> AIGunBlueprint(TEXT("/Game/Blueprints/Weapons/AIGun_BP"));
-	AIGun_BP = AIGunBlueprint.Class;
+	// Find ai gun class
+	static ConstructorHelpers::FClassFinder<AAIGun> RifleBlueprint(TEXT("/Game/Blueprints/Weapons/AIRifle_BP"));
+	Rifle_BP = RifleBlueprint.Class;
+
+	static ConstructorHelpers::FClassFinder<AAIGun> GrenadeLauncherBlueprint(TEXT("/Game/Blueprints/Weapons/AIGrenadeLauncher_BP"));
+	GrenadeLauncher_BP = GrenadeLauncherBlueprint.Class;
 
 	// Initialize Variable
 	bIsTargetSet = false;
@@ -26,25 +29,50 @@ void ANormalRangeTrooper::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Spawn an AI Gun and attach to AI Character
-	if (AIGun_BP)
+	// Spawn an AI Gun according to trooper type
+	if (TrooperType == ERangeTrooperType::RifleTrooper)
 	{
-		FActorSpawnParameters GunSpawnParameter;
-		GunSpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		AIGun = GetWorld()->SpawnActor<AAIGun>(AIGun_BP, GunSpawnParameter);
-		if (AIGun)
+		if (Rifle_BP)
 		{
-			AIGun->SetOwner(this);
-			AIGun->SetActorHiddenInGame(false);
-			// Attach third person weapon mesh to third person hero mesh, Attach first person weapon mesh to first person hero mesh, 
-			AIGun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("RifleSocket"));
+			FActorSpawnParameters GunSpawnParameter;
+			GunSpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AIGun = GetWorld()->SpawnActor<AAIGun>(Rifle_BP, GunSpawnParameter);
+			if (AIGun)
+			{
+				AIGun->SetOwner(this);
+				AIGun->SetActorHiddenInGame(false);
+				// Attach third person weapon mesh to third person hero mesh, Attach first person weapon mesh to first person hero mesh, 
+				AIGun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("RifleSocket"));
+			}
 		}
 	}
+
+	else if (TrooperType == ERangeTrooperType::GrenadeTrooper)
+	{
+		if (GrenadeLauncher_BP)
+		{
+			FActorSpawnParameters GunSpawnParameter;
+			GunSpawnParameter.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AIGun = GetWorld()->SpawnActor<AAIGun>(GrenadeLauncher_BP, GunSpawnParameter);
+			if (AIGun)
+			{
+				AIGun->SetOwner(this);
+				AIGun->SetActorHiddenInGame(false);
+				// Attach third person weapon mesh to third person hero mesh, Attach first person weapon mesh to first person hero mesh, 
+				AIGun->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("GrenadeLauncherSocket"));
+			}
+		}
+	}
+
 }
 
 void ANormalRangeTrooper::OnHealthChanged(UAttributeComponent * AttributeComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * IntigatedBy, AActor * DamageCauser)
 {   
-	UE_LOG(LogTemp, Warning, TEXT("Normal Range Trooper Get Hit"))
+	if (TrooperType == ERangeTrooperType::RifleTrooper)
+	    UE_LOG(LogTemp, Warning, TEXT("Normal Range Trooper Get Hit"))
+
+	else if (TrooperType == ERangeTrooperType::GrenadeTrooper)
+		UE_LOG(LogTemp, Warning, TEXT("Grenade Trooper Get Hit"))
 
 	if (Health <= 0.0f && bIsAlive == true)
 	{   

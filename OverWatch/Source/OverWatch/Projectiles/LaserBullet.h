@@ -36,7 +36,7 @@ protected:
 protected:
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+	void OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit) override;
 	
 private:
 	void PlayImpactEffectsBasedOnSurfaceType(EPhysicalSurface surfaceType, FVector Location);

@@ -6,6 +6,13 @@
 #include "AI/AICharacters/BaseAICharacter.h"
 #include "NormalRangeTrooper.generated.h"
 
+UENUM(BlueprintType)
+enum class ERangeTrooperType : uint8
+{
+	RifleTrooper 				     UMETA(DisplayName = "RifleTrooper"),
+	GrenadeTrooper			         UMETA(DisplayName = "GrenadeTrooper")
+};
+
 /**
  * 
  */
@@ -15,6 +22,9 @@ class OVERWATCH_API ANormalRangeTrooper : public ABaseAICharacter
 	GENERATED_BODY()
 	
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Properties")
+	ERangeTrooperType TrooperType;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI Behavior Info")
 	bool bIsTargetSet;
 
@@ -23,7 +33,10 @@ protected:
 	class AAIGun* AIGun;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	TSubclassOf<AAIGun> AIGun_BP;
+	TSubclassOf<AAIGun> Rifle_BP;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
+	TSubclassOf<AAIGun> GrenadeLauncher_BP;
 
 public:
 	// Sets default values for this character's properties

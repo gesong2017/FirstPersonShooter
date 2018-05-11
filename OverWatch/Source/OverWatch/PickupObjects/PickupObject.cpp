@@ -36,9 +36,6 @@ void APickupObject::BeginPlay()
 	// Bind Sphere Comp Overlap Event to our custom function
 	if (SphereComp)
 		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &APickupObject::OnOverlapBegin);
-
-	// Set This Actor Auto Destroy Able
-	SetLifeSpan(30.0f);
 }
 
 void APickupObject::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -85,7 +82,7 @@ void APickupObject::UpdateHeroAmmo(AHero* Hero)
 {   
 	// Update Hero's Bullets Value And UI
 	float CurrentBulletsLeftInBag = Hero->GetNumOfBulletsLeftOnHero();
-	float NewBulletsNumber = CurrentBulletsLeftInBag + 18;
+	float NewBulletsNumber = CurrentBulletsLeftInBag + 36;
 	Hero->UpdateNumOfBulletsLeftOnHero(NewBulletsNumber);
 
 	AHeroController* HeroController = Cast<AHeroController>(Hero->GetController());

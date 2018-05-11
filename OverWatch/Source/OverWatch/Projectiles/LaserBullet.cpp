@@ -26,7 +26,7 @@ void ALaserBullet::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ALaserBullet::OnHit(UPrimitiveComponent * HitComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
+void ALaserBullet::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, FVector NormalImpulse, const FHitResult & Hit)
 {   
 	// Get the surface type of the things we hit and play effects
 	EPhysicalSurface HitPointSurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
@@ -37,7 +37,7 @@ void ALaserBullet::OnHit(UPrimitiveComponent * HitComp, AActor * OtherActor, UPr
 	AHero* Hero = Cast<AHero>(OtherActor);
 	if (Hero)
 	{   
-		UE_LOG(LogTemp, Warning, TEXT("You are hit by laser bullets"))
+		UE_LOG(LogTemp, Warning, TEXT("You are hit by laser bullets %s"), *Hit.BoneName.ToString())
 
 		// Head Shot!
 		if (HitPointSurfaceType == SURFACE_FLESHVULNERABLE)
