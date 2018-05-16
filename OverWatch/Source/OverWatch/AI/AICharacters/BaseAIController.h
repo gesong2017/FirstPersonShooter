@@ -20,6 +20,9 @@ private:
 	uint8 DistanceSqrToTargetKeyID;
 	uint8 DistanceToTargetKeyID;
 	uint8 ClosestPickupKeyID;
+	uint8 StartLocationKeyID;
+	FName StartLocationKeyName;
+	FName PatrolLocationKeyName;
 
 protected:
 	UPROPERTY(transient)
@@ -42,4 +45,12 @@ public:
 	FORCEINLINE uint8 GetKeyID_DistanceSqrToTarget() const { return DistanceSqrToTargetKeyID; }
 	FORCEINLINE uint8 GetKeyID_DistanceToTarget() const { return DistanceToTargetKeyID; }
 	FORCEINLINE uint8 GetKeyID_ClosestPickup() const { return ClosestPickupKeyID; }
+	FORCEINLINE uint8 GetKeyID_StartLocation() const { return StartLocationKeyID; }
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	FName GetStartLocationKeyName() const;
+
+	UFUNCTION(BlueprintCallable)
+	FName GetPatrolLocationKeyName() const;
 };
